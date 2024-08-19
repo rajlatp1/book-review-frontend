@@ -37,3 +37,16 @@ export const deleteBook = (token, bookId) => {
 export const deleteReview = (token, reviewId) => {
     return axios.delete(`${API_URL}/admin/reviews/${reviewId}`, { headers: { 'x-access-token': token } });
 };
+
+export const addToCart = ({ token, bookId, quantity }) => {
+    return axios.post(`${API_URL}/cart`, { book_id: bookId, quantity }, { headers: { 'x-access-token': token } });
+};
+  
+export const getCartItems = () => {
+    return axios.get(`${API_URL}/cart`, { headers: { 'x-access-token': localStorage.getItem('token')} });
+};
+
+export const removeCartItem = (token, itemId) => {
+    return axios.delete(`${API_URL}/cart/${itemId}`, { headers: { 'x-access-token': token } });
+};
+  
