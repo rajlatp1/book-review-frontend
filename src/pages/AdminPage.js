@@ -1,55 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchBooks, createBook, removeBook, modifyBook } from '../features/books/booksSlice';
-import AddBook from '../components/AddBook';
-import EditBook from '../components/EditBook';
-import { Box, Button, Typography, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { Tabs, Tab, Box, Typography } from '@mui/material';
+import ManageBooks from '../components/ManageBooks';
+import ManageUsers from '../components/ManageUsers';
+import ManageReviews from '../components/ManageReviews';
+
 
 const AdminPage = () => {
-  const dispatch = useDispatch();
-  const books = useSelector((state) => state.books.books);
-  const [currentView, setCurrentView] = useState(''); 
+  const [currentTab, setCurrentTab] = useState(0);
 
 
-  useEffect(() => {
-    dispatch(fetchBooks());
-  }, [dispatch]);
-
-  const handleAddBook = (title, author, description, image) => {
-    dispatch(createBook({ title, author, description, image }));
+  const handleChange = (event, newValue) => {
+    setCurrentTab(newValue);
   };
 
-  const handleDeleteBook = (bookId) => {
-    dispatch(removeBook(bookId));
-  };
-
-  const handleUpdateBook = (bookId, title, author, description, image) => {
-    dispatch(modifyBook({ id: bookId, title, author, description, image }));
-  };
-
-  const handleAddBookClick = () => {
-    setCurrentView('add');
-  };
-
-  const handleManageBookClick = () => {
-    setCurrentView('manage');
-  };
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" padding={4} component={Paper} elevation={3}>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <Box sx={{ width: '100%', typography: 'body1', mt: 3 }}>
+      <Typography variant="h4" component="h1" gutterBottom align="center">
         Admin Panel
       </Typography>
-      <Box display="flex" gap={2} mb={4}>
-        <Button variant="contained" color="primary" onClick={handleAddBookClick}>
-          Add Book
-        </Button>
-        <Button variant="contained" color="secondary" onClick={handleManageBookClick}>
-          Manage Books
-        </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <Tabs value={currentTab} onChange={handleChange} variant="scrollable">
+          <Tab label="Manage Books" />
+          <Tab label="Manage Users" />
+          <Tab label="Manage Reviews" />
+        </Tabs>
       </Box>
-      {currentView === 'add' && <AddBook onAddBook={handleAddBook} />}
-      {currentView === 'manage' && <EditBook onUpdateBook={handleUpdateBook} books={books} onDeleteBook={handleDeleteBook} />}
+     
+      <Box
+        sx={{
+          mt: 3,
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 3,
+          maxWidth: '80%',
+          margin: 'auto',
+          bgcolor: 'background.paper'
+        }}
+      >
+        {currentTab === 0 && <ManageBooks />}
+        {currentTab === 1 && <ManageUsers />}
+        {currentTab === 2 && <ManageReviews />}
+      </Box>
     </Box>
   );
 };

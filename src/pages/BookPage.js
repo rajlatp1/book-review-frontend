@@ -4,10 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addReview } from '../features/books/booksSlice';
 import { getBook } from '../api';
 import { addItemToCart } from '../features/cart/cartSlice';
-import AddReview from '../components/AddReview';
+import BookDetails from '../components/BookDetails';
+import ReviewSection from '../components/ReviewSection';
+import AddReviewModal from '../components/AddReviewModal';
+import { Grid, Box, Pagination, Button } from '@mui/material';
 import LoginDialog from '../components/LoginDialog';
-import { Grid, Card, CardMedia, CardContent, Typography, List, ListItem, Box, Button, Modal, Pagination, IconButton, MenuItem, Select } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 
 
 const BookPage = () => {
@@ -32,18 +33,16 @@ const BookPage = () => {
 
 
   const handleAddReview = (review) => {
-    const token = localStorage.getItem('token');
-    dispatch(addReview({ token, bookId: id, review })).then(response => {
-      setReviews([...reviews, { review, user: user }]);
+    dispatch(addReview({ bookId: id, review })).then(() => {
+      setReviews([...reviews, { review, user }]);
       setOpenModal(false);
     });
   };
 
 
   const handleAddToCart = () => {
-    const token = localStorage.getItem('token');
     if (user) {
-      dispatch(addItemToCart({ token, bookId: id, quantity })).then(() => {
+      dispatch(addItemToCart({bookId: id, quantity })).then(() => {
         alert('Book added to cart successfully!');
       }).catch(err => {
         console.error('Error adding book to cart:', err);
@@ -77,7 +76,7 @@ const BookPage = () => {
 
   const handleLoginSuccess = () => {
     setLoginDialogOpen(false);
-    setOpenModal(true);  // Only opens the review modal if login was triggered by adding a review
+    setOpenModal(true);
   };
 
 
@@ -89,77 +88,45 @@ const BookPage = () => {
   return (
     <Box sx={{ mt: 4 }}>
       <Grid container spacing={2}>
+        {/* Book Image */}
         <Grid item xs={12} md={4}>
-          <Card elevation={0}>
-            <CardMedia
-              component="img"
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%',
+            }}
+          >
+            <img
+              src={book.image_link}
               alt={book.title}
-              image={book.image_link}
-              style={{ height: '400px', objectFit: 'contain' }}
+              style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }}
             />
-          </Card>
+          </Box>
         </Grid>
+       
+        {/* Book Details */}
         <Grid item xs={12} md={8}>
-          <Card elevation={0}>
-            <CardContent>
-              <Typography variant="h4" component="div" sx={{ mb: 2 }}>
-                {book.title}
-              </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-                {book.author}
-              </Typography>
-              <Typography variant="body1" component="p" sx={{ mb: 2 }}>
-                {book.description}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ mr: 2 }}>
-                  ₹{book.price}
-                </Typography>
-                <Select
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                >
-                  {[...Array(book.stock).keys()].map((q) => (
-                    <MenuItem key={q + 1} value={q + 1}>
-                      {q + 1}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
-              <Button variant="contained" onClick={handleAddToCart} sx={{ mr: 2 }}>
-                Add to Cart
-              </Button>
-              <Button variant="contained" onClick={handleBuyNow}>
-                Buy Now
-              </Button>
-            </CardContent>
-          </Card>
+          <BookDetails
+            book={book}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            handleAddToCart={handleAddToCart}
+            handleBuyNow={handleBuyNow}
+            maxQuantity={5}
+          />
         </Grid>
+
+
+        {/* Add Review Button and Review List */}
         <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">
           <Button variant="contained" onClick={handleOpenModal} sx={{ mb: 2 }}>
             Add Review
           </Button>
         </Grid>
         <Grid item xs={12} md={8}>
-          <Typography variant="h5" component="div">
-            Reviews
-          </Typography>
-          <List>
-            {currentReviews.map((review, index) => (
-              <ListItem key={index}>
-                <div>
-                  <Typography variant="body2" component="p">
-                    {review.user}:
-                  </Typography>
-                  <Typography variant="body2" component="p">
-                    {review.review}
-                  </Typography>
-                </div>
-              </ListItem>
-            ))}
-          </List>
+          <ReviewSection reviews={currentReviews} />
           <Pagination
             count={Math.ceil(reviews.length / reviewsPerPage)}
             page={currentPage}
@@ -171,22 +138,11 @@ const BookPage = () => {
 
 
       {/* Add Review Modal */}
-      <Modal
+      <AddReviewModal
         open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="add-review-modal"
-        aria-describedby="modal-for-adding-review"
-      >
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 4, boxShadow: 24, borderRadius: 2, width: 400 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Add Review</Typography>
-            <IconButton onClick={handleCloseModal}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <AddReview onAddReview={handleAddReview} />
-        </Box>
-      </Modal>
+        handleClose={handleCloseModal}
+        handleAddReview={handleAddReview}
+      />
 
 
       {/* Login Dialog */}

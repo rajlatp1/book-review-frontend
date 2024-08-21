@@ -1,52 +1,118 @@
 import axios from 'axios';
 
+
 const API_URL = 'http://localhost:5000';
 
+
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  withCredentials: true, // Ensures cookies are sent with requests
+});
+
+
 export const register = (username, password) => {
-    return axios.post(`${API_URL}/register`, { username, password });
+  return axiosInstance.post(`/register`, { username, password });
 };
+
 
 export const authenticate = (username, password) => {
-    return axios.post(`${API_URL}/login`, { username, password });
+  return axiosInstance.post(`/login`, { username, password });
 };
+
+
+export const getUserInfo = () => {
+  return axiosInstance.get(`/user-info`);
+};
+
+
+export const logout = (username, password) => {
+  return axiosInstance.post(`/logout`, { username, password });
+};
+
+
+
 
 export const getBooks = () => {
-    return axios.get(`${API_URL}/books`);
+  return axios.get(`${API_URL}/books`);
 };
+
 
 export const getBook = (id) => {
-    return axios.get(`${API_URL}/books/${id}`);
+  return axios.get(`${API_URL}/books/${id}`);
 };
 
-export const addReview = (token, bookId, review) => {
-    return axios.post(`${API_URL}/reviews`, { book_id: bookId, review }, { headers: { 'x-access-token': token } });
+
+export const addReview = (bookId, review) => {
+  return axiosInstance.post(`/reviews`, { book_id: bookId, review });
 };
 
-export const addBook = (token, title, author, description, image) => {
-    return axios.post(`${API_URL}/admin/books`, { title, author, description, image }, { headers: { 'x-access-token': token } });
+
+export const addBook = (title, author, description, price, stock, image) => {
+  return axiosInstance.post(`/admin/books`, { title, author, description, price, stock, image });
 };
 
-export const updateBook = (token, bookId, title, author, description, image) => {
-    return axios.put(`${API_URL}/admin/books/${bookId}`, { title, author, description, image }, { headers: { 'x-access-token': token } });
+
+export const updateBook = (bookId, title, author, description, price, stock, image) => {
+  return axiosInstance.put(`/admin/books/${bookId}`, { title, author, description, price, stock, image });
 };
 
-export const deleteBook = (token, bookId) => {
-    return axios.delete(`${API_URL}/admin/books/${bookId}`, { headers: { 'x-access-token': token } });
+
+export const deleteBook = (bookId) => {
+  return axiosInstance.delete(`/admin/books/${bookId}`);
 };
 
-export const deleteReview = (token, reviewId) => {
-    return axios.delete(`${API_URL}/admin/reviews/${reviewId}`, { headers: { 'x-access-token': token } });
+
+export const deleteReview = (reviewId) => {
+  return axiosInstance.delete(`${API_URL}/admin/reviews/${reviewId}`);
 };
 
-export const addToCart = ({ token, bookId, quantity }) => {
-    return axios.post(`${API_URL}/cart`, { book_id: bookId, quantity }, { headers: { 'x-access-token': token } });
+
+export const getBookReviews = (bookId) => {
+  return axiosInstance.get(`${API_URL}/books/${bookId}/reviews`);
 };
-  
+
+
+
+// Add to Cart API function
+export const addToCart = ({ bookId, quantity }) => {
+  return axiosInstance.post('/cart', { book_id: bookId, quantity });
+};
+
+
+// Get Cart Items API function
 export const getCartItems = () => {
-    return axios.get(`${API_URL}/cart`, { headers: { 'x-access-token': localStorage.getItem('token')} });
+  return axiosInstance.get('/cart');
 };
 
-export const removeCartItem = (token, itemId) => {
-    return axios.delete(`${API_URL}/cart/${itemId}`, { headers: { 'x-access-token': token } });
+
+
+
+export const removeCartItem = (itemId) => {
+  return axiosInstance.delete(`/cart/${itemId}`);
 };
-  
+
+
+
+
+export const fetchUsers = () => {
+  return axiosInstance.get('/admin/users');
+};
+
+
+export const toggleAdminStatus = (userId) => {
+  return axiosInstance.put(`/admin/users/${userId}/toggle-admin`);
+};
+
+
+export const searchUser = (query) => {
+  return axiosInstance.get(`/admin/users/search?q=${query}`);
+};
+
+
+export const promoteUserToAdmin = (userId) => {
+  return axiosInstance.put(`/admin/users/${userId}/promote`);
+};
+
+export const searchBook = (searchTerm) => {
+  return axiosInstance.get(`/books/search?q=${encodeURIComponent(searchTerm)}`);
+};

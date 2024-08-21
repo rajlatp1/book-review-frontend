@@ -7,25 +7,25 @@ export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
 });
 
 export const createBook = createAsyncThunk('books/createBook', async (book, { getState }) => {
-  const { user } = getState();
-  const response = await addBook(user.token, book.title, book.author, book.description, book.image);
+  const response = await addBook(book.title, book.author, book.description, book.image);
   return response.data;
 });
 
-export const modifyBook = createAsyncThunk('books/modifyBook', async (book, { getState }) => {
-  const { user } = getState();
-  const response = await updateBook(user.token, book.id, book.title, book.author, book.description, book.image);
+
+export const modifyBook = createAsyncThunk('books/modifyBook', async (book) => {
+  const response = await updateBook(book.id, book.title, book.author, book.description, book.image);
   return response.data;
 });
 
-export const removeBook = createAsyncThunk('books/removeBook', async (bookId, { getState }) => {
-  const { user } = getState();
-  await deleteBook(user.token, bookId);
+
+export const removeBook = createAsyncThunk('books/removeBook', async (bookId) => {
+  await deleteBook( bookId);
   return bookId;
 });
 
-export const addReview = createAsyncThunk('books/addReview', async ({ token, bookId, review }) => {
-    const response = await apiAddReview(token, bookId, review);
+
+export const addReview = createAsyncThunk('books/addReview', async ({ bookId, review }) => {
+    const response = await apiAddReview(bookId, review);
     return response.data;
 });
 

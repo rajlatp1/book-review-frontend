@@ -2,21 +2,24 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getCartItems, addToCart, removeCartItem } from '../../api';
 
 
-export const fetchCartItems = createAsyncThunk('cart/fetchCartItems', async () => {
+// Async thunk to load cart items
+export const fetchCartItems = createAsyncThunk('cart/fetchCartItems', async (user) => {
+  const response = await getCartItems(user);
+  return response.data;
+});
+
+
+// Async thunk to add an item to the cart
+export const addItemToCart = createAsyncThunk('cart/addItemToCart', async ({ bookId, quantity }) => {
+  await addToCart({bookId, quantity });
   const response = await getCartItems();
   return response.data;
 });
 
 
-export const addItemToCart = createAsyncThunk('cart/addItemToCart', async ({ token, bookId, quantity }) => {
-  await addToCart({ token, bookId, quantity });
-  const response = await getCartItems();
-  return response.data;
-});
-
-
-export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async ({ token, itemId }) => {
-  await removeCartItem(token, itemId);
+// Async thunk to remove an item from the cart
+export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async ({itemId }) => {
+  await removeCartItem(itemId);
   return itemId;
 });
 
